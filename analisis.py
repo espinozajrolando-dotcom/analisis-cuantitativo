@@ -1,7 +1,8 @@
-# ==========================================
-# APP DE ANÁLISIS CUANTITATIVO INTERACTIVO
-# ==========================================
+import streamlit as st
 
+# ==========================================
+# MOTOR ESTADÍSTICO - ANÁLISIS CUANTITATIVO
+# ==========================================
 def calcular_media(datos):
     return sum(datos) / len(datos)
 
@@ -40,54 +41,46 @@ def calcular_frecuencias_completas(datos):
         acumulada_rel += hi
         
         tabla_frecuencias.append({
-            "valor": valor,
-            "fi": fi,
-            "Fi": acumulada_abs,
-            "hi": round(hi, 4),
-            "Hi": round(acumulada_rel, 4)
+            "Valor": valor,
+            "fi (Absoluta)": fi,
+            "Fi (Acumulada)": acumulada_abs,
+            "hi (Relativa)": round(hi, 4),
+            "Hi (Rel. Acumulada)": round(acumulada_rel, 4)
         })
         
     return tabla_frecuencias
 
-def calcular_marca_de_clase(limite_inferior, limite_superior):
-    return (limite_inferior + limite_superior) / 2
+# ==========================================
+# INTERFAZ WEB CON STREAMLIT
+# ==========================================
+st.title("📊 App de Análisis Cuantitativo")
+st.write("Calcula medidas de tendencia central y tablas de frecuencias al instante.")
 
+# Cuadro de texto interactivo en la web
+entrada_usuario = st.text_input("Ingresa los datos numéricos separados por espacios (ej: 12 15 12 18 20):", "12 15 12 18 20 15")
 
-# --- MENÚ INTERACTIVO DE LA APLICACIÓN ---
-def ejecutar_app():
-    print("========================================")
-    print("📊 BIENVENIDO A TU APP DE ANÁLISIS CUANTITATIVO")
-    print("========================================")
-    
-    entrada = input("Ingresa los datos numéricos separados por espacios (ej: 12 15 12 18 20): ")
-    
-    # Convertimos el texto ingresado en una lista de números decimales/enteros
+if st.button("Calcular Estadísticas"):
     try:
-        # Si el usuario ingresa números con punto o enteros
-        datos_usuario = [float(x) if '.' in x else int(x) for x in entrada.split()]
+        # Convertir texto a lista de números
+        datos = [float(x) if '.' in x else int(x) for x in entrada_usuario.split()]
         
-        if len(datos_usuario) == 0:
-            print("⚠️ No ingresaste ningún dato.")
-            return
-
-        print("\n========================================")
-        print("📈 REPORTE DE RESULTADOS")
-        print("========================================")
-        print("Datos analizados:", datos_usuario)
-        print("Cantidad total (n):", len(datos_usuario))
-        print("Media aritmética:", round(calcular_media(datos_usuario), 2))
-        print("Mediana:", calcular_mediana(datos_usuario))
-        print("Moda:", calcular_moda(datos_usuario))
-        
-        print("\n--- TABLA DE FRECUENCIAS ---")
-        print(f"{'Valor':<8} | {'fi':<4} | {'Fi':<4} | {'hi':<6} | {'Hi':<6}")
-        print("-" * 42)
-        for fila in calcular_frecuencias_completas(datos_usuario):
-            print(f"{fila['valor']:<8} | {fila['fi']:<4} | {fila['Fi']:<4} | {fila['hi']:<6} | {fila['Hi']:<6}")
-        print("========================================")
-        
+        if len(datos) == 0:
+            st.warning("⚠️ Por favor ingresa al menos un número.")
+        else:
+            st.success("¡Análisis realizado con éxito!")
+            
+            # Métricas principales en tarjetas visuales
+            col1, col2, col3 = st.columns(3)
+            col1.metric("Cantidad (n)", len(datos))
+            col2.metric("Media", round(calcular_media(datos), 2))
+            col3.metric("Mediana", calcular_mediana(datos))
+            
+            st.write(f"**Moda(s):** {calcular_moda(datos)}")
+            
+            # Mostrar la tabla de frecuencias
+            st.subheader("📈 Tabla de Frecuencias")
+            tabla = calcular_frecuencias_completas(datos)
+            st.table(tabla)
+            
     except ValueError:
-        print("❌ Error: Asegúrate de ingresar solo números separados por espacios.")
-
-if __name__ == "__main__":
-    ejecutar_app()
+        st.error("❌ Error: Asegúrate de escribir únicamente números separados por espacios.")
