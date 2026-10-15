@@ -55,7 +55,7 @@ def calcular_frecuencias_completas(datos):
 # INTERFAZ WEB CON STREAMLIT Y GRÁFICOS
 # ==========================================
 st.title("📊 App de Análisis Cuantitativo")
-st.write("Calcula estadística descriptiva, tablas de frecuencias y polígono de frecuencias cerrado.")
+st.write("Calcula estadística descriptiva, tablas de frecuencias y polígono de frecuencias cerrado desde el origen.")
 
 # Cuadro de texto interactivo
 entrada_usuario = st.text_input("Ingresa los datos numéricos separados por espacios:", "12 15 12 18 20 15 15 22 25 30 32 35")
@@ -68,7 +68,7 @@ if st.button("Calcular y Graficar"):
         if len(datos) == 0:
             st.warning("⚠️ Por favor ingresa al menos un número.")
         else:
-            st.success("¡Análisis y gráficos estadísticos formales generados con éxito!")
+            st.success("¡Gráfico de polígono ajustado con éxito!")
             
             # Métricas principales
             col1, col2, col3 = st.columns(3)
@@ -84,9 +84,9 @@ if st.button("Calcular y Graficar"):
             st.table(tabla)
             
             # ==========================================
-            # SECCIÓN DE GRÁFICOS (Polígono cerrado en 0)
+            # SECCIÓN DE GRÁFICOS (Polígono exacto desde el origen)
             # ==========================================
-            st.subheader("📊 Visualización: Histograma con Polígono Cerrado")
+            st.subheader("📊 Visualización: Histograma con Polígono Estadístico")
             
             fig, ax = plt.subplots(figsize=(10, 5))
             
@@ -94,24 +94,29 @@ if st.button("Calcular y Graficar"):
             valores_orig = [fila["Valor"] for fila in tabla]
             frecuencias_orig = [fila["fi (Absoluta)"] for fila in tabla]
             
-            # Convertir valores a etiquetas de texto para las barras
+            # Usar posiciones numéricas en el eje X para alinear perfecto las barras y la línea
+            x_pos = list(range(len(valores_orig)))
             labels_barras = [str(v) for v in valores_orig]
             
-            # 1. Gráfico de barras de fondo (Frecuencias absolutas)
-            ax.bar(labels_barras, frecuencias_orig, color='skyblue', edgecolor='black', alpha=0.7, label='Frecuencias (fi)')
+            # 1. Gráfico de barras de fondo
+            ax.bar(x_pos, frecuencias_orig, color='skyblue', edgecolor='black', alpha=0.7, label='Frecuencias (fi)')
             
-            # 2. Preparar los datos para el polígono de frecuencias (agregando puntos en 0 al inicio y al final)
-            # Para las etiquetas del eje X, añadimos un espacio vacío o etiqueta "Antes" y "Después"
-            labels_poligono = [''] + labels_barras + ['']
-            frecuencias_poligono = [0] + frecuencias_orig + [0]
+            # 2. Coordenadas exactas para el polígono que parte y termina en el eje X (frecuencia 0)
+            # Añadimos una posición antes (-0.5) con frecuencia 0 y una después (última + 0.5) con frecuencia 0
+            x_poligono = [-0.5] + x_pos + [x_pos[-1] + 0.5]
+            y_poligono = [0] + frecuencias_orig + [0]
             
-            # Graficar la línea roja conectando desde la raíz y terminando en la raíz
-            ax.plot(labels_poligono, frecuencias_poligono, color='red', marker='o', linewidth=2.5, label='Polígono de Frecuencias')
+            # Trazar la línea del polígono
+            ax.plot(x_poligono, y_poligono, color='red', marker='o', linewidth=2.5, label='Polígono de Frecuencias')
             
-            ax.set_title("Histograma y Polígono de Frecuencias (Cerrado en el eje X)")
+            # Configurar las etiquetas del eje X para que coincidan con los valores originales
+            ax.set_xticks(x_pos)
+            ax.set_xticklabels(labels_barras)
+            
+            ax.set_title("Histograma y Polígono de Frecuencias (Cerrado en los extremos)")
             ax.set_xlabel("Valores / Marcas de Clase")
             ax.set_ylabel("Frecuencia Absoluta (fi)")
-            ax.set_ylim(bottom=0)  # Asegurar que el eje Y parta desde 0
+            ax.set_ylim(bottom=0)  # El eje Y parte estricto desde 0
             ax.grid(True, linestyle='--', alpha=0.5)
             ax.legend()
             
