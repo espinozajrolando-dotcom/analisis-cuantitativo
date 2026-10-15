@@ -86,7 +86,7 @@ if st.button("Calcular y Graficar"):
             # ==========================================
             # SECCIÓN DE GRÁFICOS (Polígono anclado en esquinas 0)
             # ==========================================
-            st.subheader("📊 Visualización: Histograma MC y Grafico de Frecuencia")
+            st.subheader("📊 Visualización: Histograma MC y Grafico de Frecuencias")
             
             fig, ax = plt.subplots(figsize=(10, 5))
             
