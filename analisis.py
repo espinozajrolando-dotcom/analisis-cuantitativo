@@ -55,7 +55,7 @@ def calcular_frecuencias_completas(datos):
 # INTERFAZ WEB CON STREAMLIT Y GRÁFICOS
 # ==========================================
 st.title("📊 App de Análisis Cuantitativo")
-st.write("Calcula estadística descriptiva, tablas de frecuencias y polígono de frecuencias cerrado desde el origen.")
+st.write("Calcula estadística descriptiva, tablas de frecuencias y polígono de frecuencias estrictamente desde el origen.")
 
 # Cuadro de texto interactivo
 entrada_usuario = st.text_input("Ingresa los datos numéricos separados por espacios:", "12 15 12 18 20 15 15 22 25 30 32 35")
@@ -68,7 +68,7 @@ if st.button("Calcular y Graficar"):
         if len(datos) == 0:
             st.warning("⚠️ Por favor ingresa al menos un número.")
         else:
-            st.success("¡Gráfico de polígono ajustado con éxito!")
+            st.success("¡Gráfico perfeccionado desde el origen con éxito!")
             
             # Métricas principales
             col1, col2, col3 = st.columns(3)
@@ -84,39 +84,40 @@ if st.button("Calcular y Graficar"):
             st.table(tabla)
             
             # ==========================================
-            # SECCIÓN DE GRÁFICOS (Polígono exacto desde el origen)
+            # SECCIÓN DE GRÁFICOS (Polígono anclado en esquinas 0)
             # ==========================================
-            st.subheader("📊 Visualización: Histograma con Polígono Estadístico")
+            st.subheader("📊 Visualización: Histograma con Polígono en el Origen")
             
             fig, ax = plt.subplots(figsize=(10, 5))
             
-            # Extraer valores y frecuencias originales
+            # Extraer valores y frecuencias
             valores_orig = [fila["Valor"] for fila in tabla]
             frecuencias_orig = [fila["fi (Absoluta)"] for fila in tabla]
             
-            # Usar posiciones numéricas en el eje X para alinear perfecto las barras y la línea
             x_pos = list(range(len(valores_orig)))
             labels_barras = [str(v) for v in valores_orig]
             
             # 1. Gráfico de barras de fondo
             ax.bar(x_pos, frecuencias_orig, color='skyblue', edgecolor='black', alpha=0.7, label='Frecuencias (fi)')
             
-            # 2. Coordenadas exactas para el polígono que parte y termina en el eje X (frecuencia 0)
-            # Añadimos una posición antes (-0.5) con frecuencia 0 y una después (última + 0.5) con frecuencia 0
-            x_poligono = [-0.5] + x_pos + [x_pos[-1] + 0.5]
+            # 2. Coordenadas extendidas para que la línea toque estrictamente los bordes laterales externos en cero
+            x_poligono = [x_pos[0] - 0.5] + x_pos + [x_pos[-1] + 0.5]
             y_poligono = [0] + frecuencias_orig + [0]
             
-            # Trazar la línea del polígono
+            # Trazar polígono
             ax.plot(x_poligono, y_poligono, color='red', marker='o', linewidth=2.5, label='Polígono de Frecuencias')
             
-            # Configurar las etiquetas del eje X para que coincidan con los valores originales
+            # Fijar los límites exactos del eje X para que coincidan con los extremos de los puntos adicionales
+            ax.set_xlim(x_pos[0] - 0.5, x_pos[-1] + 0.5)
+            
+            # Configurar etiquetas
             ax.set_xticks(x_pos)
             ax.set_xticklabels(labels_barras)
             
-            ax.set_title("Histograma y Polígono de Frecuencias (Cerrado en los extremos)")
+            ax.set_title("Histograma y Polígono de Frecuencias (Anclado en los extremos)")
             ax.set_xlabel("Valores / Marcas de Clase")
             ax.set_ylabel("Frecuencia Absoluta (fi)")
-            ax.set_ylim(bottom=0)  # El eje Y parte estricto desde 0
+            ax.set_ylim(bottom=0)
             ax.grid(True, linestyle='--', alpha=0.5)
             ax.legend()
             
