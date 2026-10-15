@@ -55,7 +55,7 @@ def calcular_frecuencias_completas(datos):
 # INTERFAZ WEB CON STREAMLIT Y GRÁFICOS
 # ==========================================
 st.title("📊 App de Análisis Cuantitativo")
-st.write("Calcula estadística descriptiva, tablas de frecuencias y polígono de frecuencias por marca de clase.")
+st.write("Calcula estadística descriptiva, tablas de frecuencias y polígono de frecuencias cerrado.")
 
 # Cuadro de texto interactivo
 entrada_usuario = st.text_input("Ingresa los datos numéricos separados por espacios:", "12 15 12 18 20 15 15 22 25 30 32 35")
@@ -68,7 +68,7 @@ if st.button("Calcular y Graficar"):
         if len(datos) == 0:
             st.warning("⚠️ Por favor ingresa al menos un número.")
         else:
-            st.success("¡Análisis y gráficos avanzados generados con éxito!")
+            st.success("¡Análisis y gráficos estadísticos formales generados con éxito!")
             
             # Métricas principales
             col1, col2, col3 = st.columns(3)
@@ -84,25 +84,34 @@ if st.button("Calcular y Graficar"):
             st.table(tabla)
             
             # ==========================================
-            # SECCIÓN DE GRÁFICOS AVANZADOS
+            # SECCIÓN DE GRÁFICOS (Polígono cerrado en 0)
             # ==========================================
-            st.subheader("📊 Visualización: Gráfico de Barras con Polígono de Marcas de Clase")
+            st.subheader("📊 Visualización: Histograma con Polígono Cerrado")
             
             fig, ax = plt.subplots(figsize=(10, 5))
             
-            # Extraer valores y frecuencias de la tabla
-            valores = [str(fila["Valor"]) for fila in tabla]
-            frecuencias = [fila["fi (Absoluta)"] for fila in tabla]
+            # Extraer valores y frecuencias originales
+            valores_orig = [fila["Valor"] for fila in tabla]
+            frecuencias_orig = [fila["fi (Absoluta)"] for fila in tabla]
+            
+            # Convertir valores a etiquetas de texto para las barras
+            labels_barras = [str(v) for v in valores_orig]
             
             # 1. Gráfico de barras de fondo (Frecuencias absolutas)
-            ax.bar(valores, frecuencias, color='skyblue', edgecolor='black', alpha=0.7, label='Frecuencias (fi)')
+            ax.bar(labels_barras, frecuencias_orig, color='skyblue', edgecolor='black', alpha=0.7, label='Frecuencias (fi)')
             
-            # 2. Gráfico de líneas superpuesto basado en la marca de clase / valores
-            ax.plot(valores, frecuencias, color='red', marker='o', linewidth=2.5, label='Polígono (Marca de Clase)')
+            # 2. Preparar los datos para el polígono de frecuencias (agregando puntos en 0 al inicio y al final)
+            # Para las etiquetas del eje X, añadimos un espacio vacío o etiqueta "Antes" y "Después"
+            labels_poligono = [''] + labels_barras + ['']
+            frecuencias_poligono = [0] + frecuencias_orig + [0]
             
-            ax.set_title("Diagrama de Barras con Polígono de Frecuencias")
+            # Graficar la línea roja conectando desde la raíz y terminando en la raíz
+            ax.plot(labels_poligono, frecuencias_poligono, color='red', marker='o', linewidth=2.5, label='Polígono de Frecuencias')
+            
+            ax.set_title("Histograma y Polígono de Frecuencias (Cerrado en el eje X)")
             ax.set_xlabel("Valores / Marcas de Clase")
             ax.set_ylabel("Frecuencia Absoluta (fi)")
+            ax.set_ylim(bottom=0)  # Asegurar que el eje Y parta desde 0
             ax.grid(True, linestyle='--', alpha=0.5)
             ax.legend()
             
