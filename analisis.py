@@ -126,3 +126,7 @@ if st.button("Calcular y Graficar"):
             
     except ValueError:
         st.error("❌ Error: Asegúrate de escribir únicamente números separados por espacios.")
+
+st.markdown("---")
+st.markdown("<p style='text-align: center; color: gray;'>Desarrollado con Python y Streamlit por Matematicas MLZ © 2026</p>", 
+    unsafe_allow_html=True)
