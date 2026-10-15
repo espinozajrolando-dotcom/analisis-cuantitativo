@@ -1,4 +1,5 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 
 # ==========================================
 # MOTOR ESTADÍSTICO - ANÁLISIS CUANTITATIVO
@@ -51,15 +52,15 @@ def calcular_frecuencias_completas(datos):
     return tabla_frecuencias
 
 # ==========================================
-# INTERFAZ WEB CON STREAMLIT
+# INTERFAZ WEB CON STREAMLIT Y GRÁFICOS
 # ==========================================
-st.title("📊 App de Análisis Cuantitativo")
-st.write("Calcula medidas de tendencia central y tablas de frecuencias al instante.")
+st.title("📊 App de Análisis Cuantitativo con Gráficos")
+st.write("Calcula medidas de estadística descriptiva y visualiza tus datos al instante.")
 
-# Cuadro de texto interactivo en la web
-entrada_usuario = st.text_input("Ingresa los datos numéricos separados por espacios (ej: 12 15 12 18 20):", "12 15 12 18 20 15")
+# Cuadro de texto interactivo
+entrada_usuario = st.text_input("Ingresa los datos numéricos separados por espacios (ej: 12 15 12 18 20 15 15 22):", "12 15 12 18 20 15 15 22 25")
 
-if st.button("Calcular Estadísticas"):
+if st.button("Calcular y Graficar"):
     try:
         # Convertir texto a lista de números
         datos = [float(x) if '.' in x else int(x) for x in entrada_usuario.split()]
@@ -67,7 +68,7 @@ if st.button("Calcular Estadísticas"):
         if len(datos) == 0:
             st.warning("⚠️ Por favor ingresa al menos un número.")
         else:
-            st.success("¡Análisis realizado con éxito!")
+            st.success("¡Análisis y gráficos generados con éxito!")
             
             # Métricas principales en tarjetas visuales
             col1, col2, col3 = st.columns(3)
@@ -81,6 +82,36 @@ if st.button("Calcular Estadísticas"):
             st.subheader("📈 Tabla de Frecuencias")
             tabla = calcular_frecuencias_completas(datos)
             st.table(tabla)
+            
+            # ==========================================
+            # SECCIÓN DE GRÁFICOS (Histograma y Barras)
+            # ==========================================
+            st.subheader("📊 Visualización Gráfica")
+            
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+            
+            # 1. Histograma de distribución
+            ax1.hist(datos, bins='auto', color='skyblue', edgecolor='black')
+            ax1.set_title("Histograma de Frecuencia")
+            ax1.set_xlabel("Valores")
+            ax1.set_ylabel("Frecuencia")
+            ax1.grid(True, linestyle='--', alpha=0.6)
+            
+            # 2. Gráfico de barras (Valores vs Frecuencia Absoluta)
+            valores = [fila["Valor"] for fila in tabla]
+            frecuencias = [fila["fi (Absoluta)"] for fila in tabla]
+            
+            ax2.bar(range(len(valores)), frecuencias, color='salmon', edgecolor='black')
+            ax2.set_title("Gráfico de Barras (Frecuencias)")
+            ax2.set_xlabel("Valores únicos")
+            ax2.set_ylabel("Frecuencia Absoluta (fi)")
+            ax2.set_xticks(range(len(valores)))
+            ax2.set_xticklabels(valores)
+            ax2.grid(True, linestyle='--', alpha=0.6)
+            
+            # Ajustar diseño y mostrar en Streamlit
+            plt.tight_layout()
+            st.pyplot(fig)
             
     except ValueError:
         st.error("❌ Error: Asegúrate de escribir únicamente números separados por espacios.")
