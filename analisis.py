@@ -86,7 +86,7 @@ if st.button("Calcular y Graficar"):
             # ==========================================
             # SECCIÓN DE GRÁFICOS (Polígono anclado en esquinas 0)
             # ==========================================
-            st.subheader("📊 Visualización: Histograma")
+            st.subheader("📊 Visualización: Histograma MC y Grafico de Frecuencia")
             
             fig, ax = plt.subplots(figsize=(10, 5))
             
@@ -105,7 +105,7 @@ if st.button("Calcular y Graficar"):
             y_poligono = [0] + frecuencias_orig + [0]
             
             # Trazar polígono
-            ax.plot(x_poligono, y_poligono, color='red', marker='o', linewidth=2.5, label='Polígono de Frecuencias')
+            ax.plot(x_poligono, y_poligono, color='red', marker='o', linewidth=2.5, label='Polígono de marca de clase')
             
             # Fijar los límites exactos del eje X para que coincidan con los extremos de los puntos adicionales
             ax.set_xlim(x_pos[0] - 0.5, x_pos[-1] + 0.5)
